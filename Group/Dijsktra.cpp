@@ -2,21 +2,18 @@
 
 using namespace std;
 
-// typedef pair<int, int> pii;
+typedef pair<int, int> pii;
 
 struct node {
     int name, distance;
     node(int name, int distance) :name(name), distance(distance) { ; }
-    bool operator<(const node& a) const
-    {
+    bool operator<(const node &a) const {
         return distance < a.distance;
     }
-    bool equal(const node& a) const
-    {
+    bool equal(const node &a) const {
         return distance == a.distance;
     }
-    bool operator>(const node& a) const
-    {
+    bool operator>(const node &a) const {
         return distance > a.distance;
     }
 };
@@ -30,7 +27,7 @@ struct cmp //重写仿函数
 class Solution {
 public:
     /**
-     * @param edges: 图中的边
+     * @param edges: 图中的边[name1,name2,dis]
      * @param num: 图中的点的数量
      * @param start: 出发点
      * @returns 从出发点到所有其他点的最短路
@@ -39,31 +36,38 @@ public:
         vector<int> res;
         res.resize(num, INT_MAX);
         if (start >= num) return res;
-        
+
         vector<bool> search;
         search.resize(num, false);
 
-        vector<vector<int>> g;
-        for (const auto &edge : edges)
-            g[edge[0]].push_back(edge[1]);
+        vector<vector<node>> g;
+        for (const auto &edge : edges) {
+            g[edge[0]].push_back(node(edge[1], edge[2]));
+            g[edge[1]].push_back(node(edge[0], edge[2]));
+        }
 
         priority_queue<node, vector<node>, cmp> pq;
         pq.push(node{ start,0 });
-        while (!pq.empty()) { ; }
+        res[start] = 0;
+        search[start] = false;
+        while (!pq.empty()) {
+            node n = pq.top();
+            for (const auto &son : g[n.name]) {
+                if (!search[son.name]) {
+                    search[son.name] = true;
+                    res[son.name] = n.distance + son.distance;
+                    pq.push(node(son.name, res[son.name]));
+                }
+            }
+            pq.pop();
+        }
         return res;
     }
 };
 
 
 int main() {
-    priority_queue<node, vector<node>, cmp> pq;
-    pq.push(node{ 0,103 });
-    pq.push(node{ 3,211 });
-    pq.push(node{ 2,96 });
-    while (!pq.empty()) {
-        cout << pq.top().name << " " << pq.top().distance << "\n";
-        pq.pop();
-    }
+    
     //system("pause");
     return 0;
 }

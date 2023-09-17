@@ -1,0 +1,16 @@
+单调栈 可以 在于找到 i < j; a[i] > a[j]
+a = [1,2,6,3,5]
+
+i:0->n
+    while (! s.empty() && s.top() > a[i]) s.pop()
+    s.push(i)
+
+=> s : 0,1,3,4 
+=> a[2] > a[3]
+
+i:n->0
+    while (!s.empty() && a[i] > s.top()) s.pop()
+    s.push(i)
+
+=> s : 2,1,0
+=> a[3] < a[2], a[4] < a[2]
