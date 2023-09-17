@@ -8,8 +8,8 @@ using namespace std;
 
 int main() {
     int idx = 3;
-    for (int jj = true, i = 0; i < 0; i++)
-        cout << "1";
+    cin >> idx;
+    cout << idx;
 
     //system("pause");
     return 0;
