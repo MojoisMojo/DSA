@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++.exe build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            // "program": "${fileDirname}\\Execollections\\${fileBasenameNoExtension}.exe",
+            // "args": [],
+            "program": "C:\\Windows\\System32\\cmd.exe",
+            "args": [
+                "/C",
+                "${fileDirname}\\Execollections\\${fileBasenameNoExtension}.exe",
+                "&",
+                "echo.",
+                "&",
+                "pause"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:\\Program Files\\MingW64\\mingw_x86_64_8.1.0\\mingw64\\bin\\gdb.exe", //前面的路径改成你安装的路径
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "task g++"
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console":"externalTerminal",
+            "justMyCode": true
+        }
+    ]
+}
