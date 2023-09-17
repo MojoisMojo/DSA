@@ -26,23 +26,8 @@ public:
     int maxNumberOfAlloys(int n, int k, int budget, vector<vector<int>> &composition, vector<int> &stock, vector<int> &cost) {
         if (k == 0 || budget < 0) return 0;
         if (k == 1) return cal_Single(budget, n, composition[0], stock, cost);
-        int this_max = cal_Single(budget, n, composition[0], stock, cost);
-        vector<vector<int>> this_comp(composition.begin() + 1, composition.end());
-        int this_budget = budget;
-        vector<int> this_stock = stock;
-        int ans = maxNumberOfAlloys(n, k - 1, this_budget, this_comp, this_stock, cost);
-
-        for (int this_produce = 1; this_produce <= this_max && this_budget > 0; this_produce++) {
-            for (int j = 0; j < n; j++) {
-                if (this_stock[j] >= composition[0][j]) { this_stock[j] -= composition[0][j]; }
-                else {
-                    this_budget -= (composition[0][j] - this_stock[j]) * cost[j];
-                    this_stock[j] = 0;
-                }
-            }
-            ans = max(ans, this_produce + maxNumberOfAlloys(n, k - 1, this_budget, this_comp, this_stock, cost));
-
-        }
+        int ans = 0;
+        for (int i = 0; i < k; i++) ans = max(ans, cal_Single(budget, n, composition[i], stock, cost));
         return ans;
     }
 };
