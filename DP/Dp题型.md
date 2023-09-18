@@ -16,5 +16,17 @@
 
 45 [跳跃游戏 II](https://leetcode.cn/problems/jump-game-ii/)
 
-1140 [石子游戏Ⅱ](https://leetcode.cn/problems/stone-game-ii/solution/)
+1140 [石子游戏 Ⅱ](https://leetcode.cn/problems/stone-game-ii/solution/)
 有记忆化搜索算法 深搜
+
+198 [打家劫舍](https://leetcode.cn/problems/house-robber)
+
+[code](../leetcode/198_HouseRobber.cpp)
+
+213 [打家劫舍 Ⅱ](https://leetcode.cn/problems/house-robber-ii)
+
+[code](../leetcode/198_HouseRobberⅡ.cpp)
+
+377 [打家劫舍 Ⅲ](https://leetcode.cn/problems/house-robber-iii)
+
+[code](../leetcode/198_HouseRobberⅢ.cpp)

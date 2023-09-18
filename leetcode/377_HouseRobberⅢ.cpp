@@ -13,14 +13,28 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+struct SubtreeStatus {
+    int selected;
+    int notSelected;
+};
+
 class Solution {
-    vector<int> dp{ 0 };
-    int dfs(TreeNode *node) {
-        
-    }
 public:
-    int rob(TreeNode *root) {
-        
+    // 选择 与 不选择 该节点得思路
+    SubtreeStatus dfs(TreeNode *node) {
+        if (!node) {
+            return {0, 0};
+        }
+        auto l = dfs(node->left);
+        auto r = dfs(node->right);
+        int selected = node->val + l.notSelected + r.notSelected;
+        int notSelected = max(l.selected, l.notSelected) + max(r.selected, r.notSelected);
+        return {selected, notSelected};
+    }
+
+    int rob(TreeNode* root) {
+        auto rootStatus = dfs(root);
+        return max(rootStatus.selected, rootStatus.notSelected);
     }
 };
 
