@@ -12,6 +12,7 @@ int modoleOne() {
         else r = mid - 1;
     }
     return l;
+    
 }
 
 int modoleTwo() {
