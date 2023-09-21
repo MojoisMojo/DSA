@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-
+// 很没意思的一道题目
 class Solution {
         static const int mapsize = 8;
         inline static int calPlace(const auto &place){return place[0] * mapsize + place[1];};

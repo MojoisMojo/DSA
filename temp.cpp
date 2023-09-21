@@ -8,11 +8,9 @@ using namespace std;
 
 int main() {
     int idx = 3;
-    while (idx--)
-    {
-        cout << "1 ";
-    }
-    
+    cin >> idx;
+    cout << idx;
+
     //system("pause");
     return 0;
 }
