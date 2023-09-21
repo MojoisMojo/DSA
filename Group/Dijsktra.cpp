@@ -52,6 +52,7 @@ public:
         search[start] = false;
         while (!pq.empty()) {
             node n = pq.top();
+            if(search[n.name]) continue;
             search[n.name] = true;
             for (const auto &son : g[n.name]) {
                 int this_dis = n.distance + son.distance;
