@@ -21,12 +21,12 @@
 
 198 [打家劫舍](https://leetcode.cn/problems/house-robber)
 
-[code](../leetcode/198_HouseRobber.cpp)
+[code](../leetcode/dp/198_HouseRobber.cpp)
 
 213 [打家劫舍 Ⅱ](https://leetcode.cn/problems/house-robber-ii)
 
-[code](../leetcode/198_HouseRobberⅡ.cpp)
+[code](../leetcode/dp/198_HouseRobberⅡ.cpp)
 
 377 [打家劫舍 Ⅲ](https://leetcode.cn/problems/house-robber-iii)
 
-[code](../leetcode/198_HouseRobberⅢ.cpp)
+[code](../leetcode/dp/198_HouseRobberⅢ.cpp)
