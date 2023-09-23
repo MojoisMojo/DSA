@@ -21,8 +21,8 @@ if __name__ == "__main__":
     root = TreeNode(3,
                     left=TreeNode(2),
                     right=TreeNode(1,
-                                   left=TreeNode(4),
-                                   right=TreeNode(0)
-                                   )
+                                    left=TreeNode(4),
+                                    right=TreeNode(0)
+                                    )
                     )
     print(Solution().rob(root))
