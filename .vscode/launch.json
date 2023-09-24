@@ -21,7 +21,7 @@
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "D:\\Program Files\\MingW64\\mingw_x86_64_8.1.0\\mingw64\\bin\\gdb.exe", //前面的路径改成你安装的路径
+            "miDebuggerPath": "D:\\.Professor\\.vscode\\CodeConfiguration\\mingw64\\bin\\gdb.exe", //前面的路径改成你安装的路径
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
