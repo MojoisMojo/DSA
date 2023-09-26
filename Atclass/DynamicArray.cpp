@@ -18,8 +18,8 @@ public:
             ;
         }
         else {
-            int *new_arr = new int[_capacity << 1];
-            for (int i = 0; i < _capacity; i++) {
+            int *new_arr = new int[_capacity <<= 1];
+            for (int i = 0; i < _currentSize; i++) {
                 new_arr[i] = _arr[i];
             }
             free(_arr);
