@@ -1,4 +1,4 @@
-from .import*
+inf = 0x3f3f3f3f
 x=2
 s = []
 target = []
