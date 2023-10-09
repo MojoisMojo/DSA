@@ -7,9 +7,9 @@
 using namespace std;
 
 int main() {
-    int idx = 3;
-    cin >> idx;
-    cout << idx;
+    int idx[3] = { 1,2,3 };
+    int *pos1 = idx,*pos2 = idx;
+    cout << *(pos1++)**(pos2++);
 
     //system("pause");
     return 0;
