@@ -8,3 +8,4 @@ class Solution:
         for i,j in pairwise(p):
             f0,f1=f1,min(f0+2*(j-i),f1+x)
         return f1 // 2
+    
