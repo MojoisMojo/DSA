@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 class Solution {
 public:
@@ -8,6 +7,7 @@ public:
         if (k <= 0) return 0LL;
         long long ans = 0LL;
         priority_queue<int, vector<int>, greater<int>> pq(nums.begin(), nums.end());
+        // less => 大顶堆
         for (int i = 0; i < k; i++) {
             int m = pq.top();
             ans += m;

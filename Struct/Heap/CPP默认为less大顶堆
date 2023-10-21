@@ -1,0 +1,6 @@
+#include <queue>
+// in stl_heap.h:
+if (__comp(__first + __secondChild, __first + (__secondChild - 1)))
+__secondChild--;
+
+// cmp => true, 选第二个，否则选第一个，大顶堆=》“选大的”；小顶堆=》“选小的”
