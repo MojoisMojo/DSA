@@ -56,7 +56,8 @@ public:
         vector<int> path;
         stack<int> edpath;
         // find the path
-        int st = min(anspairs.first, anspairs.second), ed = max(anspairs.first, anspairs.second);
+        int st = anspairs.first, ed = anspairs.second;
+        if (idx_map[st] > idx_map[ed]) { swap(st, ed); }
         while (depth_map[st] < depth_map[ed]) { edpath.push(idx_map[ed]); ed = father(ed); }
         while (depth_map[st] > depth_map[ed]) { path.push_back(idx_map[st]); st = father(st); }
         while (st != ed) {
