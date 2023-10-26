@@ -3,21 +3,21 @@
 using namespace std;
 
 //   Definition for a binary tree node.
-struct TreeNode {
+struct Node {
     int val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode() : val(0), left(nullptr), right(nullptr) {}
-    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+    Node *left;
+    Node *right;
+    Node() : val(0), left(nullptr), right(nullptr) {}
+    Node(int x) : val(x), left(nullptr), right(nullptr) {}
+    Node(int x, Node *left, Node *right) : val(x), left(left), right(right) {}
 };
 
 class Solution {
 public:
-    TreeNode *constructMaximumBinaryTree(vector<int> &nums) {
-        stack<TreeNode *> st;
+    Node *constructMaximumBinaryTree(vector<int> &nums) {
+        stack<Node *> st;
         for (const auto &n : nums) {
-            TreeNode* this_node = new TreeNode(n);
+            Node* this_node = new Node(n);
             while (!st.empty() && st.top()->val < this_node->val) {
                 this_node->left = st.top();
                 st.pop();
