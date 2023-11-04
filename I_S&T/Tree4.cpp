@@ -11,7 +11,7 @@ struct Node {
         :pos(pos_), pos_fa(pos_fa_), mature(mature_), l(l_), r(r_) {
     }
     void addson(Node *son) {
-        if (l) { if (r) return; else r = son; }
+        if (l) { if (r) return; else r = son; return; }
         l = son;
     }
 };
