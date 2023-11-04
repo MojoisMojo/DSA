@@ -2,20 +2,17 @@
 #include<string.h>
 using namespace std;
 
-struct node {
-    node *sons[2];
-    int num;
+struct Node {
+    Node *l, *r;
     int mature; // 记录值
     int pos; // 记录idx
-    int pos_fa;// 
-    node() {
-        pos_fa = num = mature = pos = 0;
-        sons[0] = nullptr;
-        sons[1] = nullptr;
+    int pos_fa;// 记录 father 的idx
+    Node(int pos_ = -1, int pos_fa_ = -1, int mature_ = -1, Node *l_ = nullptr, Node *r_ = nullptr)
+        :pos(pos_), pos_fa(pos_fa_), mature(mature_), l(l_), r(r_) {
     }
-    void addson(node *son) {
-        sons[num] = son;
-        num++;
+    void addson(Node *son) {
+        if (l) { if (r) return; else r = son; }
+        l = son;
     }
 };
 
@@ -24,60 +21,63 @@ struct answer {
     int value;
     int begin, end;
     int lens_a;
-    answer() {
-        begin = end = 0;
-        value = 0;
-        lens_a = 0;
+    answer(int b_ = 0, int e_ = 0, int len_ = 0, int v_ = 0)
+        :begin(b_), end(e_), value(v_), lens_a(len_) {
+        ;
     }
 };
 
 struct leaf {
     int value;
     int pos_apple;
-    leaf() {
-        value = pos_apple = 0;
+    leaf(int v_ = 0, int p_ = 0) {
+        value = v_;
+        pos_apple = p_;
     }
 };
 
 answer f[60000];
-node apple[60000];
+Node apple[60000];
 int n;
 
-answer dp(int pos) {
+answer dfs(int pos) {
     answer temp;
-    temp.value = apple[pos].mature;
-    if (apple[pos].num == 0) {
+    Node &curr_node = apple[pos];
+    temp.value = curr_node.mature;
+    if (!curr_node.l && !curr_node.r) {
+        //若 左右均为空->叶子节点
         temp.begin = temp.end = pos;
         temp.lens_a = 1;
         temp.value = apple[pos].mature;
         return temp;
     }
     int son = 0;
-    answer sons[2];
-    for (int i = 0; i < apple[pos].num; i++) {
-        sons[i] = dp(apple[pos].sons[i]->pos);
-    }
-    if (apple[pos].num == 2) {
-        int value0 = sons[0].value, value1 = sons[1].value;
+    answer ans_l, ans_r;
+    Node *&sonl = curr_node.l;
+    Node *&sonr = curr_node.r;
+    ans_l = dfs(curr_node.l->pos);
+    ans_r = dfs(curr_node.r->pos);
+    if (curr_node.l && curr_node.r) {
+        int value0 = ans_l.value, value1 = ans_r.value;
         bool flag0 = (value0 > 0), flag1 = (value1 > 0);
 
         if (flag0 == true && flag1 == true) {
-            if (sons[0].value > sons[1].value) { son = 0; }
+            if (ans_l.value > ans_r.value) { son = 0; }
             else if (value0 < value1) { son = 1; }
             else {
-                if (sons[0].lens_a > sons[1].lens_a) {
+                if (ans_l.lens_a > ans_r.lens_a) {
                     son = 1;
                 }
-                else if (sons[0].lens_a < sons[1].lens_a) {
+                else if (ans_l.lens_a < ans_r.lens_a) {
                     son = 0;
                 }
-                else if (sons[0].begin > sons[1].begin) { son = 1; }
+                else if (ans_l.begin > ans_r.begin) { son = 1; }
                 else { son = 0; }
             }
         }
     }
     else {
-        if (sons[0].value <= 0) {
+        if (ans_l.value <= 0) {
             temp.begin = temp.end = pos;
             temp.lens_a = 1;
             temp.value = apple[pos].mature;
@@ -85,16 +85,16 @@ answer dp(int pos) {
         }
     }
     if (son == 0) {
-        temp.lens_a = sons[0].lens_a + 1;
-        temp.begin = sons[0].begin;
+        temp.lens_a = ans_l.lens_a + 1;
+        temp.begin = ans_l.begin;
         temp.end = pos;
-        temp.value += sons[0].value;
+        temp.value += ans_l.value;
     }
     else {
-        temp.lens_a = sons[1].lens_a + 1;
-        temp.begin = sons[1].begin;
+        temp.lens_a = ans_r.lens_a + 1;
+        temp.begin = ans_r.begin;
         temp.end = pos;
-        temp.value += sons[1].value;
+        temp.value += ans_r.value;
     }
     return temp;
 }
@@ -163,16 +163,17 @@ int main() {
     answer temp[2];
     for (int pos = 0; pos <= count; pos++) {
         f[pos].value = apple[pos].mature;
-        for (int j = 0; j < apple[pos].num; j++) {
-            temp[j] = dp((apple[pos].sons[j])->pos);
+        Node &curr_node = apple[pos];
+        for (int j = 0; j < 2; j++) {
+            temp[j] = j ? dfs((apple[pos].r)->pos) : dfs((apple[pos].l)->pos);
             f[pos].value += (temp[j].value > 0 ? temp[j].value : 0);
         }
-        if (apple[pos].num == 0) {
+        if (!curr_node.l && !curr_node.r) {
             f[pos].lens_a = 1;
             f[pos].begin = f[pos].end = pos;
             continue;
         }
-        else if (apple[pos].num == 2) {
+        else if (curr_node.l && curr_node.r) {
 
             int value0 = temp[0].value, value1 = temp[1].value;
             int len0 = temp[0].lens_a, len1 = temp[1].lens_a;
