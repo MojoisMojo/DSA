@@ -1,7 +1,9 @@
 #include<iostream>
 #include<string.h>
 using namespace std;
-
+/**
+ *这是一份他人错误的代码
+*/
 struct Node {
     Node *l, *r;
     int mature; // 记录值
@@ -29,7 +31,7 @@ struct answer {
 
 struct leaf {
     int value;
-    int pos_apple;
+    int pos_apple; // 
     leaf(int v_ = 0, int p_ = 0) {
         value = v_;
         pos_apple = p_;
@@ -62,28 +64,31 @@ answer dfs(int pos) {
         bool flag0 = (value0 > 0), flag1 = (value1 > 0);
 
         if (flag0 == true && flag1 == true) {
-            if (ans_l.value > ans_r.value) { son = 0; }
+            if (value0 > value1) { son = 0; }
             else if (value0 < value1) { son = 1; }
-            else {
+            else { // value0 == value1, then compare the length
                 if (ans_l.lens_a > ans_r.lens_a) {
                     son = 1;
                 }
                 else if (ans_l.lens_a < ans_r.lens_a) {
                     son = 0;
                 }
-                else if (ans_l.begin > ans_r.begin) { son = 1; }
-                else { son = 0; }
+                else {// length equal
+                    if (ans_l.begin > ans_r.begin) { son = 1; }
+                    else { son = 0; }
+                }
             }
         }
     }
     else {
-        if (ans_l.value <= 0) {
+        if (!curr_node.l || ans_l.value <= 0) {
             temp.begin = temp.end = pos;
             temp.lens_a = 1;
             temp.value = apple[pos].mature;
             return temp;
         }
     }
+
     if (son == 0) {
         temp.lens_a = ans_l.lens_a + 1;
         temp.begin = ans_l.begin;

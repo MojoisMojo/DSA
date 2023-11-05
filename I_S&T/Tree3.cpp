@@ -3,7 +3,10 @@
 #include<vector>
 
 using namespace std;
-
+/**
+ *这是一份 他人正确的代码
+ *
+*/
 struct TreeNode {
     int val;//值
     int seq;//顺序
