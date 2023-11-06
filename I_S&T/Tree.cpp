@@ -2,118 +2,152 @@
 
 using namespace std;
 
-class Solution
-{
-    unordered_map<int, int> idx_map;//key:nodes中的下标, value:真实序号
-    vector<int> nodes;
-    deque<int> ansPath;
+class Solution {
+    typedef struct TreeNode {
+        int val, idx, depth;
+        TreeNode *l, *r, *f;
+        TreeNode(int _val = 0, int _idx = -1, int _depth = -1,
+            TreeNode *_l = nullptr, TreeNode *_r = nullptr, TreeNode *_f = nullptr) :
+            val(_val), idx(_idx), depth(_depth), l(_l), r(_r), f(_f) {
+            ;
+        }
+    }*Ptn;
+
+    Ptn root;
+
     int ansLength;
+    pair<Ptn, Ptn> anspairs;
     int maxSum;
     int _size;
-    // idx为在nodes中的下标
-    int father(int idx) {
-        if (idx == 0) return -1;
-        return (idx - 1) >> 1;
-    }
-    int sonl(int idx) {
-        int s = idx << 1 + 1;
-        if (s < _size) return s;
-        return -1;
-    }
-    int sonr(int idx) {
-        int s = (idx + 1) << 1;
-        if (s < _size) return s;
-        return -1;
+
+    void buildTree(vector<int> &nodes) {
+        queue<TreeNode *> curr_level, next_level;
+        int idx_depth = 1, idx_cnt = 0;
+        root = new TreeNode(nodes[0], idx_cnt++, 0);
+        curr_level.push(root);
+        for (int i = 1; ; ) {
+            TreeNode *curr_node = curr_level.front();  curr_level.pop();
+            if (nodes[i]) {
+                next_level.push(curr_node->l =
+                    new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
+                );
+            }
+            if (++i >= nodes.size()) break;
+            if (nodes[i]) {
+                next_level.push(curr_node->r =
+                    new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
+                );
+            }
+            if (++i >= nodes.size()) break;
+            if (curr_level.empty()) {
+                curr_level = next_level;
+                next_level = queue<TreeNode *>();
+                idx_depth++;
+            }
+        }
     }
 public:
     Solution(vector<int> &nodes) {
-        this->nodes = nodes;
+        buildTree(nodes);
         maxSum = -0x3f3f3f3f;
         ansLength = 0x3f3f3f3f;
-        _size = nodes.size();
-        int cnt = 0;
-        for (int i = 0; i < nodes.size();++i)
-        {
-            if (nodes[i] == 0) idx_map[i] = -1;
-            idx_map[i] = cnt++;
-        }
+        anspairs.first = root;
+        anspairs.second = root;
     }
-    bool should_doSwap(deque<int> temp, int tempSum) {
-        if (tempSum > maxSum) return true;
-        else if (tempSum < maxSum) return false;
-        // else ==
-        if (temp.size() < ansLength) return true;
-        else if (temp.size() > ansLength) return false;
-        // else == 寄 一一比较
-        deque<int> tempAns(ansPath);
-        while (!temp.empty())
-        {
-            int tf = temp.front(), taf = tempAns.front();
-            if (tf < taf) return true;
-            else if (tf > taf) return false;
-            temp.pop_front();
-            tempAns.pop_front();
+
+    vector<int> findMinLenthMaxSumPath() {
+        helper(root);
+        vector<int> path;
+        stack<int> edpath;
+        auto st = anspairs.first, ed = anspairs.second;
+        if (st->idx > ed->idx) { swap(st, ed); }
+        while (st->depth < ed->depth) { edpath.push(ed->idx); ed = ed->f; }
+        while (st->depth > ed->depth) { path.push_back(st->idx); st = st->f; }
+        while (st != ed) {
+            path.push_back(st->idx);
+            edpath.push(ed->idx);
+            st = st->f;
+            ed = ed->f;
         }
-        assert(false);
+        path.push_back(st->idx);
+        while (!edpath.empty()) {
+            path.push_back(edpath.top()); edpath.pop();
+        }
+        return path;
+
     }
-    deque<int> find_miniSumMaxPath(int posidx) {
-        if (posidx == -1 || nodes[posidx] == 0) return deque<int>(); // 空节点
-        int sl = sonl(posidx), sr = sonr(posidx);
-        auto dequel = find_miniSumMaxPath(sl);
-        auto dequer = find_miniSumMaxPath(sr);
-        bool singleMe = false;
-        if (sl == -1 && sr == -1) //没有儿子了
+
+private:
+
+    bool should_changeMaxi(int tempLength, int tempSum) {
+        return (tempSum > this->maxSum) || (tempSum == this->maxSum && tempLength <= ansLength);
+    }
+
+    TreeNode *helper(TreeNode *node) {
+        // 返回一个叶节点
+        if (node == nullptr) return nullptr; // 空节点
+        auto sl = node->l, sr = node->r;
+        auto leafl = helper(sl);
+        auto leafr = helper(sr);
+        auto res = node;
+        int tempSum = node->val;
+        int tempLength = 1;
+        pair<Ptn, Ptn> tempPair(node, node);
+
+        if (sl == nullptr && sr == nullptr); //没有儿子了
+        else if (sl == nullptr || sl->val <= 0) // 左儿子没有或者没用
         {
-            singleMe = true;
-        }
-        // sl != -1 || sr != -1
-        else if (sl == -1 || nodes[sl] <= 0) // 左儿子没有或者没用
-        {
-            if (nodes[sr] <= 0)
-                singleMe = true; // 右儿子没用
-            else
-            {
-                nodes[posidx] += nodes[sr];
-                deque<int> res(dequer);
-                res.push_front(idx_map[posidx]);
-                return res;
+            if (sr == nullptr || sr->val <= 0); // 右儿子没有或者没用
+            else { // 右儿子有且有用
+                node->val += sr->val;
+                tempSum = node->val;
+                tempPair.first = leafr;
+                tempPair.second = node;
+                tempLength = leafr->depth - node->depth + 1;
+                res = leafr;
             }
         }
-        // sl != -1 && nodes[sl] > 0
-        else if (sr == -1 || nodes[sr] <= 0)// 右儿子没有或者没用
+        else if (sr == nullptr || sr->val <= 0)// 右儿子没有或者没用
         {
-            // if (nodes[sl] <= 0)
-            //     singleMe = true; // 左儿子没用 不会发生
-            nodes[posidx] += nodes[sl];
-            deque<int> res(dequer);
-            res.push_back(idx_map[posidx]);
-            return res;
-        }
-        // sl != -1 && nodes[sl] > 0 && sr != -1 && nodes[sr] > 0
-        else
-        {
-            int tempRes = nodes[sl] + nodes[sr] + nodes[posidx];
-            deque<int> tempres(dequel);
-            tempres.push_back(idx_map[posidx]);
-            tempres.emplace_back(dequer);
-        }
-        if (singleMe)
-        {
-            deque<int> res(1, idx_map[posidx]);
-            if (should_doSwap(res, nodes[posidx]))
-            {
-                maxSum = nodes[posidx];
-                ansLength = 1;
-                ansPath = res;
+            if (sl == nullptr || sl->val <= 0); // 左儿子没有或者没用
+            else { // 左儿子有且有用
+                node->val += sl->val;
+                tempSum = node->val;
+                tempPair.first = leafl;
+                tempPair.second = node;
+                tempLength = leafl->depth - node->depth + 1;
+                res = leafl;
             }
-            return res;
         }
-        //都有用
+        else if (sl && sl->val > 0 && sr && sr->val > 0) {
+            tempSum = node->val + sl->val + sr->val;
+            tempPair.first = leafl;
+            tempPair.second = leafr;
+            tempLength = leafl->depth + leafr->depth - 2 * node->depth + 1;
+            bool choseL = (sl->val > sr->val) || (sl->val == sr->val && leafl->depth < leafr->depth);
+            res = choseL ? leafl : leafr;
+            node->val += choseL ? sl->val : sr->val;
+        }
+        if (should_changeMaxi(tempLength, tempSum)) {
+            this->maxSum = tempSum;
+            this->ansLength = tempLength;
+            this->anspairs = tempPair;
+        }
+        return res;
     }
+
 };
 
 int main() {
-
-    //system("pause");
+    int k;
+    cin >> k;
+    vector<int> array;
+    int num;
+    while (k-- > 0) {
+        cin >> num;
+        array.push_back(num);
+    }
+    for (auto &n : Solution(array).findMinLenthMaxSumPath()) cout << n << " ";
+    cout << endl;
     return 0;
 }
