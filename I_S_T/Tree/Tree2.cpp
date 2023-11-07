@@ -10,8 +10,7 @@ using namespace std;
 // }
 
 class Solution {
-    class TreeNode {
-    public:
+    typedef struct TreeNode {
         int val, idx, depth;
         TreeNode *l, *r, *f;
         TreeNode(int _val = 0, int _idx = -1, int _depth = -1,
@@ -19,33 +18,32 @@ class Solution {
             val(_val), idx(_idx), depth(_depth), l(_l), r(_r), f(_f) {
             ;
         }
-    }*root;
-    typedef TreeNode *Ptn;
-    // vector<int> idx_map; //idx:nodes中的下标, value:真实序号
-    // vector<int> depth_map; //idx:nodes中的下标, value:深度
-    // vector<int> nodes;
+    }*Ptn;
+
+    Ptn root;
+
     int ansLength;
     pair<Ptn, Ptn> anspairs;
     int maxSum;
     int _size;
+
     void buildTree(vector<int> &nodes) {
         queue<TreeNode *> curr_level, next_level;
         int idx_depth = 1, idx_cnt = 0;
         root = new TreeNode(nodes[0], idx_cnt++, 0);
         curr_level.push(root);
         for (int i = 1; ; ) {
-            TreeNode *curr_node = curr_level.front();
-            curr_level.pop();
-            if (nodes[i] != 0) {
-                auto sonl = new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node);
-                curr_node->l = sonl;
-                next_level.push(sonl);
+            TreeNode *curr_node = curr_level.front();  curr_level.pop();
+            if (nodes[i]) {
+                next_level.push(curr_node->l =
+                    new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
+                );
             }
             if (++i >= nodes.size()) break;
-            if (nodes[i] != 0) {
-                auto sonr = new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node);
-                curr_node->r = sonr;
-                next_level.push(sonr);
+            if (nodes[i]) {
+                next_level.push(curr_node->r =
+                    new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
+                );
             }
             if (++i >= nodes.size()) break;
             if (curr_level.empty()) {
