@@ -91,15 +91,8 @@ private:
 
     bool should_changeMaxi(int tempLength, int tempSum) {
         return (tempSum > this->maxSum) || (tempSum == this->maxSum && tempLength <= ansLength);
-        // if (tempSum > this->maxSum) return true;
-        // else if (tempSum < this->maxSum) return false;
-        // // else ==
-        // if (tempLength <= this->ansLength) return true;
-        // else //(tempLength > this->ansLength)
-        //     return false;
         // 题目 说最大的只有一个 所以当tSum = mSum tLength = ansLength 时，\
         我们选择改变最大值，因为先出现的已经固定死了，后出现要么不是最大值，要么在后面会有更大的值加进来
-        // assert(false);
     }
 
     TreeNode *helper(TreeNode *node) {
