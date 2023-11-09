@@ -3,10 +3,9 @@
 using namespace std;
 
 int main() {
-    string a;
-    int n = 'a';
-    a += n;
-    cout << a;
+    int *a = new int[2] {0};
+    cout << a[0] << a[1];
+    delete[]a;
     //system("pause");
     return 0;
 }
