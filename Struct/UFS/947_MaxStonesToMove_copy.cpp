@@ -5,12 +5,14 @@ using namespace std;
 class DisjointSetUnion {
 private:
     unordered_map<int, int> f, rank;
-
+    int number_of_connectedComponent;
 public:
+    DisjointSetUnion() { number_of_connectedComponent = 0; }
     int find(int x) {
         if (!f.count(x)) {
             f[x] = x;
             rank[x] = 1;
+            ++number_of_connectedComponent;
         }
         return f[x] == x ? x : f[x] = find(f[x]);
     }
@@ -20,6 +22,7 @@ public:
         if (fx == fy) {
             return;
         }
+        --number_of_connectedComponent;
         if (rank[fx] < rank[fy]) {
             swap(fx, fy);
         }
@@ -28,13 +31,7 @@ public:
     }
 
     int numberOfConnectedComponent() {
-        int num = 0;
-        for (auto &[x, fa] : f) {
-            if (x == fa) {
-                num++;
-            }
-        }
-        return num;
+        return number_of_connectedComponent;
     }
 };
 
