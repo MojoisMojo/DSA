@@ -41,7 +41,7 @@ public:
 
 int main() {
     int k;
-    vector<int> arr;
+    vector<int> arr{ 0 };
     cin >> k;
     while (k--) {
         int num;
@@ -80,8 +80,7 @@ BinaryTree::BinaryTree(vector<int> &arr) :BinaryTree() {
                 q.emplace(curr->r);
             }
         }
-        cout << cnt << endl;
-        edges_number += cnt;
+        this->edges_number += cnt;
     }
 }
 
