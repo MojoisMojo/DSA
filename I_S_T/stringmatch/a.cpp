@@ -1,11 +1,15 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
 int main() {
-    int *a = new int[2] {0};
-    cout << a[0] << a[1];
-    delete[]a;
-    //system("pause");
+    string name;
+    cin >> name;
+    cout << "hello " + name << endl;
+    // system("pause");
     return 0;
 }
+
+
