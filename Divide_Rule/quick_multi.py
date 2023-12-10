@@ -1,0 +1,1 @@
+pow(base=5,exp=10,mod=114514)
