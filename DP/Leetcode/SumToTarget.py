@@ -26,7 +26,7 @@ class Solution:
                 t -= 1
         return dp[target]
     def minNumElementsToTarget(self,array:List[int],target:int)-> int:
-        """求和为target的元素的最小数目 % MOD"""
+        """求和为target的元素的最小数目"""
         n = len(array)
         dp = [0] + [inf for _ in range(target)]
         for i in range(n,0,-1):
