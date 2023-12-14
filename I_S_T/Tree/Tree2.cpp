@@ -12,10 +12,10 @@ using namespace std;
 class Solution {
     typedef struct TreeNode {
         int val, idx, depth;
-        TreeNode *l, *r, *f;
+        TreeNode *left, *right, *f;
         TreeNode(int _val = 0, int _idx = -1, int _depth = -1,
             TreeNode *_l = nullptr, TreeNode *_r = nullptr, TreeNode *_f = nullptr) :
-            val(_val), idx(_idx), depth(_depth), l(_l), r(_r), f(_f) {
+            val(_val), idx(_idx), depth(_depth), left(_l), right(_r), f(_f) {
             ;
         }
     }*Ptn;
@@ -35,13 +35,13 @@ class Solution {
         for (int i = 1; ; ) {
             TreeNode *curr_node = curr_level.front();  curr_level.pop();
             if (nodes[i]) {
-                next_level.push(curr_node->l =
+                next_level.push(curr_node->left =
                     new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
                 );
             }
             if (++i >= nodes.size()) break;
             if (nodes[i]) {
-                next_level.push(curr_node->r =
+                next_level.push(curr_node->right =
                     new TreeNode(nodes[i], idx_cnt++, idx_depth, nullptr, nullptr, curr_node)
                 );
             }
@@ -96,7 +96,7 @@ private:
     TreeNode *helper(TreeNode *node) {
         // 返回一个叶节点
         if (node == nullptr) return nullptr; // 空节点
-        auto sl = node->l, sr = node->r;
+        auto sl = node->left, sr = node->right;
         auto leafl = helper(sl);
         auto leafr = helper(sr);
         auto res = node;
