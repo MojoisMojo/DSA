@@ -1,6 +1,7 @@
 from typing import List
 inf = 0x7f7f7f7f
 MOD = int(1e9+7)
+"""three very classic problems of dp"""
 class Solution:
     def canbeSumToTarget(self,array:List[int],target:int)->bool:
         """是否能求和为target"""
