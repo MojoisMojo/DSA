@@ -1,3 +1,7 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+using namespace std;
 class Solution {
 public:
     vector<int> secondGreaterElement(vector<int> &nums) {
@@ -22,3 +26,8 @@ public:
         return res;
     }
 };
+
+int main() {
+
+    return 0;
+}
