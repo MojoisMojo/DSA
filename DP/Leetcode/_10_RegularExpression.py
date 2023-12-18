@@ -10,10 +10,10 @@ class Solution:
         dp[0][0] = True
         '==' means equal => match
         dp[i][j] = 
-        dp[i-1][j-1] && p[j-1] match s[i-1] (if p[j-1] != '*')
+        dp[i-1][j-1] && p[j] match s[i] (if p[j] != '*')
         or (else :)
-                   dp[i-1][j-1] && p[j-1] match s[i - 1]
-                   dp[i-1][j]   && p[j-1] match s[i - 1]
+                   dp[i-1][j-1] && p[j - 1] match s[i]
+                   dp[i-1][j]   && p[j - 1] match s[i]
                 or dp[i][j-1] 
                 or dp[i][j-2]
         """
