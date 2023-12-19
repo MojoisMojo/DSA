@@ -3,7 +3,8 @@
 using namespace std;
 
 int main() {
-    int x = int();
+    vector<int> h;
+    h.shrink_to_fit
     //system("pause");
     return 0;
 }
