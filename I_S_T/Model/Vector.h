@@ -36,6 +36,7 @@ public:
     }
     ~Vector() {
         delete[] _arr;
+        _arr = nullptr;
     }
     Vector(const Vector &other) {
         *this = other;
@@ -54,7 +55,7 @@ public:
     // 向数组末尾添加元素，如果数组已满，扩展容量，扩展为原来的两倍
     void push_back(T value) {
         if (_currentSize >= _capacity) {
-            this->changeCapacity(this->_capacity << 1);
+            this->changeCapacity((this->_capacity * 3) / 2);
         }
         _arr[_currentSize++] = value;
     }
@@ -68,13 +69,10 @@ public:
         if (index >= _currentSize) {
             throw("index overflows!");
         }
-        _currentSize--;
-        for (int i = index; i < _currentSize; i++) {
-            _arr[i] = _arr[i + 1];
-        }
-        if (_capacity >= (minSize << 1) && _currentSize < ((1 + _capacity) >> 1)) {
-            this->changeCapacity(this->_capacity >> 1);
-        }
+        memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
+        // if (_capacity >= (minSize << 1) && _currentSize < ((1 + _capacity) >> 1)) {
+        //     this->changeCapacity(this->_capacity >> 1);
+        // }
     }
 
     int &operator[](int index) {

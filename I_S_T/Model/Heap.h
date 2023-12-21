@@ -89,6 +89,7 @@ protected:
 
     void sinkdown() {
         // pop 之后
+        if(_size <= 0) return;
         for (size_t pos = 1; ; ) {
             size_t sonl = son_l(pos), sonr = son_r(pos);
             if (sonl == 0 && sonr == 0) return;
