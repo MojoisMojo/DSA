@@ -2,44 +2,85 @@
 #define VECTOR_H
 #include <iostream>
 using namespace std;
+namespace _Vector
+{
+    const static int minSize = 10;// 初始容量为10
+} // namespace _Vector
+
 template <class T>
 class Vector {
-    const static int minSize = 10;// 初始容量为10
     void changeCapacity(int new_capacity) {
         if (new_capacity < this->_currentSize) {
-            throw("Capacity can not be smaller than size!");
+            throw runtime_error("Capacity can not be smaller than size!");
             return;
         }
         this->_capacity = new_capacity;
         T *old = this->_arr;
         if (this->_capacity > 0) {
             this->_arr = new T[this->_capacity];
-            memcpy(_arr, old, sizeof(T) * this->_currentSize);
+            for (int i = 0; i < this->_currentSize; ++i) {
+                _arr[i] = old[i];
+            }
         }
         else {
             this->_arr = nullptr;
         }
         delete[] old;
+        old = nullptr;
     }
     // 获取指定索引的元素
-    int &get(int index) {
+    T &get(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
         return _arr[index];
     }
 public:
     Vector() {
-        _capacity = this->minSize;
+        _capacity = _Vector::minSize;
         _arr = new T[_capacity];
         _currentSize = 0;
     }
+    Vector(int _size) {
+        _capacity = max(_Vector::minSize, _size);
+        _currentSize = _size;
+        _arr = new T[_capacity];
+    }
+    Vector(int _size, const T &t) {
+        _capacity = max(_Vector::minSize, _size);
+        _currentSize = _size;
+        _arr = new T[_capacity];
+        for (int i = 0; i < _currentSize; ++i) {
+            _arr[i] = t;
+        }
+    }
+    Vector(initializer_list<T> t_array) {
+        _capacity = _currentSize = t_array.size();
+        _arr = new T[_capacity];
+        auto it = t_array.begin();
+        for (int i = 0; i < _currentSize; it++, i++) {
+            _arr[i] = *it;
+        }
+    }
     ~Vector() {
-        delete[] _arr;
-        _arr = nullptr;
+        if (_arr)
+            delete[] _arr;
+        this->_arr = nullptr;
+        this->_capacity = 0;
+        this->_currentSize = 0;
     }
     Vector(const Vector &other) {
-        *this = other;
+        this->_capacity = other._capacity;
+        this->_currentSize = other._currentSize;
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
+        else {
+            this->_arr = nullptr;
+        }
     }
 
     Vector &operator=(const Vector &other) {
@@ -47,8 +88,12 @@ public:
         this->~Vector();
         this->_capacity = other._capacity;
         this->_currentSize = other._currentSize;
-        this->_arr = new T[this->_capacity];
-        memcpy(_arr, other._arr, sizeof(T) * this->_currentSize);
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
         return *this;
     }
 
@@ -67,17 +112,18 @@ public:
     // 删除指定索引的元素
     void erase(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
-        else if (index == _currentSize - 1) {
-            _currentSize--;
+        else if (index == --_currentSize) {
         }
         else {
-            memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
+            for (int i = index; i < _currentSize - 1; ++i) {
+                _arr[i] = _arr[i + 1];
+            }
         }
     }
 
-    int &operator[](int index) {
+    T &operator[](int index) {
         return get(index);
     }
 
@@ -91,12 +137,11 @@ public:
         return _capacity;
     }
 
-    // 打印数组的所有元素
-    void print() {
-        for (int i = 0; i < _currentSize; i++) {
-            cout << _arr[i] << " ";
+    friend ostream &operator<<(ostream &ost, const Vector<T> &v) {
+        for (int i = 0; i < v._currentSize; i++) {
+            ost << v._arr[i] << " ";
         }
-        cout << endl;
+        return ost;
     }
 
     void clear() {

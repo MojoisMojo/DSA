@@ -27,14 +27,16 @@ template <class T>
 class Vector {
     void changeCapacity(int new_capacity) {
         if (new_capacity < this->_currentSize) {
-            throw("Capacity can not be smaller than size!");
+            throw runtime_error("Capacity can not be smaller than size!");
             return;
         }
         this->_capacity = new_capacity;
         T *old = this->_arr;
         if (this->_capacity > 0) {
             this->_arr = new T[this->_capacity];
-            memcpy(_arr, old, sizeof(T) * this->_currentSize);
+            for (int i = 0; i < this->_currentSize; ++i) {
+                _arr[i] = old[i];
+            }
         }
         else {
             this->_arr = nullptr;
@@ -45,7 +47,7 @@ class Vector {
     // 获取指定索引的元素
     T &get(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
         return _arr[index];
     }
@@ -79,13 +81,22 @@ public:
     ~Vector() {
         if (_arr)
             delete[] _arr;
-        _arr = nullptr;
+        this->_arr = nullptr;
+        this->_capacity = 0;
+        this->_currentSize = 0;
     }
     Vector(const Vector &other) {
         this->_capacity = other._capacity;
         this->_currentSize = other._currentSize;
-        this->_arr = new T[this->_capacity];
-        memcpy(_arr, other._arr, sizeof(T) * this->_currentSize);
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
+        else {
+            this->_arr = nullptr;
+        }
     }
 
     Vector &operator=(const Vector &other) {
@@ -93,8 +104,12 @@ public:
         this->~Vector();
         this->_capacity = other._capacity;
         this->_currentSize = other._currentSize;
-        this->_arr = new T[this->_capacity];
-        memcpy(_arr, other._arr, sizeof(T) * this->_currentSize);
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
         return *this;
     }
 
@@ -113,13 +128,14 @@ public:
     // 删除指定索引的元素
     void erase(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
-        else if (index == _currentSize - 1) {
-            _currentSize--;
+        else if (index == --_currentSize) {
         }
         else {
-            memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
+            for (int i = index; i < _currentSize - 1; ++i) {
+                _arr[i] = _arr[i + 1];
+            }
         }
     }
 
@@ -156,7 +172,9 @@ private:
     T *_arr;
     int _capacity;
     int _currentSize;
-};template <class T, class cmpclass = Less<T>>
+};
+
+template <class T, class cmpclass = Less<T>>
 class Heap {
 public:
     Heap() :_size(0) {
@@ -181,7 +199,7 @@ public:
     }
 
     inline T top() {
-        if (empty()) { throw("heap is empty!"); }
+        if (empty()) { throw runtime_error("heap is empty!"); }
         return _arr[1];
     }
 
@@ -268,7 +286,6 @@ typedef struct E {
 } E;
 const static int NULLVAL = -1;
 class Solution {
-public:
     Vector<int> Dijsktra(int n, Vector<Vector<E>> &graph, int start) {
         ProrityQueue<E, Greater<E>> pq;
         Vector<int> dis(n, NULLVAL);
@@ -285,24 +302,42 @@ public:
         }
         return dis;
     }
+public:
+    int minDistanceToD(int n, Vector<Vector<int>> &edges, int s1, int s2, int d) {
+        Vector<Vector<E>> graph1(n), graph2(n);
+        for (int i = 0; i < edges.size(); ++i) {
+            auto &edge = edges[i];
+            int u = edge[0], v = edge[1], w = edge[2];
+            graph1[u].push_back({ v,w });
+            graph2[v].push_back({ u,w });
+        }
+        auto disfroms1 = Dijsktra(n, graph1, s1);
+        auto disfroms2 = Dijsktra(n, graph1, s2);
+        auto distod = Dijsktra(n, graph2, d);
+        int ans = 0x7f7f7f7f;
+        for (int i = 0; i < n; ++i) {
+            if (disfroms1[i] != NULLVAL && disfroms2[i] != NULLVAL && distod[i] != NULLVAL)
+                ans = min(ans, disfroms1[i] + disfroms2[i] + distod[i]);
+        }
+        return ans == 0x7f7f7f7f ? -1 : ans;
+    }
 };
 
 int main() {
-    int  N,M, S;
-    cin >> N >> M >> S;
+    int M, N, S1, S2, D;
+    cin >> M >> N >> S1 >> S2 >> D;
     Vector<Vector<int>>edges;
-    while (M--) {
+    while (N--) {
         int u, v, w;
         cin >> u >> v >> w;
         edges.push_back(Vector<int>{u, v, w});
     }
-    Vector<Vector<E>> graph(N);
-    for (int i = 0; i < edges.size(); ++i) {
-        auto &edge = edges[i];
-        int u = edge[0], v = edge[1], w = edge[2];
-        graph[u].push_back({ v,w });
+    try{
+        cout << Solution().minDistanceToD(M, edges, S1, S2, D);
     }
-    cout << Solution().Dijsktra(M, graph, S) << endl;
+    catch (runtime_error &e) {
+        cerr << e.what() << endl;
+    }
     //system("pause");
     return 0;
 }

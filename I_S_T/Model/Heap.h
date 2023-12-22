@@ -31,7 +31,7 @@ public:
     }
 
     inline T top() {
-        if (empty()) { throw("heap is empty!"); }
+        if (empty()) { throw runtime_error("heap is empty!"); }
         return _arr[1];
     }
 
@@ -67,13 +67,11 @@ protected:
     }
 
     inline size_t son_l(size_t idx) {
-        size_t l = idx << 1;
-        return l <= _size ? l : 0;
+        return idx << 1;
     }
 
     inline size_t son_r(size_t idx) {
-        size_t r = 1 + (idx << 1);
-        return r <= _size ? r : 0;
+        return 1 + (idx << 1);
     }
 
     void flowup() {
@@ -89,10 +87,10 @@ protected:
         if (empty()) return;
         for (size_t pos = 1; ; ) {
             size_t sonl = son_l(pos), sonr = son_r(pos);
-            if (sonl == 0 && sonr == 0) return;
+            if (sonl > _size && sonr > _size) return;
             size_t toswap = sonl;
-            if (sonl == 0) toswap = sonr;
-            else if (sonr != 0) {
+            if (sonl > _size) toswap = sonr;
+            else if (sonr <= _size) {
                 toswap = (cmp(_arr[sonr], _arr[sonl]) ? sonl : sonr);
             }
             if (!cmp(_arr[pos], _arr[toswap]))
@@ -102,5 +100,4 @@ protected:
         }
     }
 };
-
 #endif

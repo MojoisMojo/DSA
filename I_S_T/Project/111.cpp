@@ -17,7 +17,6 @@ public:
         return t1 < t2;
     }
 };
-
 namespace _Vector
 {
     const static int minSize = 10;// 初始容量为10
@@ -69,10 +68,11 @@ public:
         }
     }
     Vector(initializer_list<T> t_array) {
+
         _capacity = _currentSize = t_array.size();
         _arr = new T[_capacity];
         auto it = t_array.begin();
-        for (int i = 0; i < _currentSize; it++, i++) {
+        for (int i = 0; it != t_array.end(); it++, i++) {
             _arr[i] = *it;
         }
     }
@@ -156,153 +156,21 @@ private:
     T *_arr;
     int _capacity;
     int _currentSize;
-};template <class T, class cmpclass = Less<T>>
-class Heap {
-public:
-    Heap() :_size(0) {
-        _arr.push_back(T());
-    }
-    ~Heap() {
-        _size = 0;
-        _arr.clear();
-    }
-
-    void push(T val) {
-        _size++;
-        _arr.push_back(val);
-        flowup();
-    }
-
-    void pop() {
-        if (_size == 0) return;
-        _arr[1] = _arr[_size--];
-        _arr.pop_back();
-        sinkdown();
-    }
-
-    inline T top() {
-        if (empty()) { throw("heap is empty!"); }
-        return _arr[1];
-    }
-
-    inline size_t size() {
-        return _size;
-    }
-
-    void print() {
-        for (size_t i = 1; i <= _size; ++i) {
-            cout << _arr[i] << " ";
-        }
-        cout << endl;
-    }
-
-    inline bool empty() {
-        return _size == 0;
-    }
-
-protected:
-    cmpclass cmp;
-    Vector<T> _arr;
-    size_t _size;
-    /**
- * 1
- * 2,           3
- * 4,   5       6,      7
- * 8,9  10,11   12,13   14,15
- *
- *
-*/
-    inline size_t father(size_t idx) {
-        return idx >> 1;
-    }
-
-    inline size_t son_l(size_t idx) {
-        return idx << 1;
-    }
-
-    inline size_t son_r(size_t idx) {
-        return 1 + (idx << 1);
-    }
-
-    void flowup() {
-        // push 之后
-        for (size_t pos = _size, _father = father(pos);
-            _father != 0 && cmp(_arr[_father], _arr[pos]);
-            pos = _father, _father = father(pos))
-            swap(_arr[pos], _arr[_father]);
-    }
-
-    void sinkdown() {
-        // pop 之后
-        if (empty()) return;
-        for (size_t pos = 1; ; ) {
-            size_t sonl = son_l(pos), sonr = son_r(pos);
-            if (sonl > _size && sonr > _size) return;
-            size_t toswap = sonl;
-            if (sonl > _size) toswap = sonr;
-            else if (sonr <= _size) {
-                toswap = (cmp(_arr[sonr], _arr[sonl]) ? sonl : sonr);
-            }
-            if (!cmp(_arr[pos], _arr[toswap]))
-                return;
-            swap(_arr[pos], _arr[toswap]);
-            pos = toswap;
-        }
-    }
 };
 
-
-template <class T, class cmp = Less<T>>
-class ProrityQueue :public Heap<T, cmp> {
-};
-
-typedef struct E {
-    int first, second;
-    E(int first = 0, int second = 0) :first(first), second(second) {}
-    friend bool operator<(const E &e1, const E &e2) {
-        return e1.first < e2.first || (e1.first == e2.first && e1.second < e2.second);
-    }
-    friend bool operator>(const E &e1, const E &e2) {
-        return e1.first > e2.first || (e1.first == e2.first && e1.second > e2.second);
-    }
-} E;
-const static int NULLVAL = -1;
-class Solution {
-public:
-    Vector<int> Dijsktra(int n, Vector<Vector<E>> &graph, int start) {
-        ProrityQueue<E, Greater<E>> pq;
-        Vector<int> dis(n, NULLVAL);
-        pq.push(E(dis[start] = 0, start));
-        while (!pq.empty()) {
-            auto e = pq.top(); pq.pop();
-            int d = e.first, u = e.second;
-            for (int i = 0; i < graph[u].size(); ++i) {
-                int v = graph[u][i].first, w = graph[u][i].second;
-                if (dis[v] != NULLVAL && d + w >= dis[v]) { continue; }
-                dis[v] = d + w;
-                pq.push(E(dis[v], v));
-            }
-        }
-        return dis;
-    }
-};
+Vector<int> getFirst(Vector<Vector<int>> &vvi) {
+    Vector<int> e = vvi[0];
+    return e;
+}
 
 int main() {
-    int  N,M, S;
-    cin >> N >> M >> S;
-    Vector<Vector<int>>edges;
-    while (M--) {
-        int u, v, w;
-        cin >> u >> v >> w;
-        edges.push_back(Vector<int>{u, v, w});
-    }
-    Vector<Vector<E>> graph(N);
-    for (int i = 0; i < edges.size(); ++i) {
-        auto &edge = edges[i];
-        int u = edge[0], v = edge[1], w = edge[2];
-        graph[u].push_back({ v,w });
-    }
-    cout << Solution().Dijsktra(M, graph, S) << endl;
-    //system("pause");
-    return 0;
+    // Vector<int> vi{ 1,2,3 };
+    // cout << vi << endl;
+    // Vector<Vector<int>> vvi(2, vi);
+    // cout << vvi << endl;
+    // cout << vvi[0] << endl;
+    // cout << getFirst(vvi) << endl;
+    // system("pause");
+    int *p = new int[0];
+    cout << (p ? 1 : 0) << endl;
 }

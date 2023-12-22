@@ -27,14 +27,16 @@ template <class T>
 class Vector {
     void changeCapacity(int new_capacity) {
         if (new_capacity < this->_currentSize) {
-            throw("Capacity can not be smaller than size!");
+            throw runtime_error("Capacity can not be smaller than size!");
             return;
         }
         this->_capacity = new_capacity;
         T *old = this->_arr;
         if (this->_capacity > 0) {
             this->_arr = new T[this->_capacity];
-            memcpy(_arr, old, sizeof(T) * this->_currentSize);
+            for (int i = 0; i < this->_currentSize; ++i) {
+                _arr[i] = old[i];
+            }
         }
         else {
             this->_arr = nullptr;
@@ -45,7 +47,7 @@ class Vector {
     // 获取指定索引的元素
     T &get(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
         return _arr[index];
     }
@@ -79,13 +81,22 @@ public:
     ~Vector() {
         if (_arr)
             delete[] _arr;
-        _arr = nullptr;
+        this->_arr = nullptr;
+        this->_capacity = 0;
+        this->_currentSize = 0;
     }
     Vector(const Vector &other) {
         this->_capacity = other._capacity;
         this->_currentSize = other._currentSize;
-        this->_arr = new T[this->_capacity];
-        memcpy(_arr, other._arr, sizeof(T) * this->_currentSize);
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
+        else {
+            this->_arr = nullptr;
+        }
     }
 
     Vector &operator=(const Vector &other) {
@@ -93,8 +104,12 @@ public:
         this->~Vector();
         this->_capacity = other._capacity;
         this->_currentSize = other._currentSize;
-        this->_arr = new T[this->_capacity];
-        memcpy(_arr, other._arr, sizeof(T) * this->_currentSize);
+        if (_capacity > 0) {
+            this->_arr = new T[this->_capacity];
+            for (int i = 0; i < this->_currentSize; ++i) {
+                this->_arr[i] = other._arr[i];
+            }
+        }
         return *this;
     }
 
@@ -113,13 +128,14 @@ public:
     // 删除指定索引的元素
     void erase(int index) {
         if (index >= _currentSize) {
-            throw("index overflows!");
+            throw runtime_error("index overflows!");
         }
-        else if (index == _currentSize - 1) {
-            _currentSize--;
+        else if (index == --_currentSize) {
         }
         else {
-            memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
+            for (int i = index; i < _currentSize - 1; ++i) {
+                _arr[i] = _arr[i + 1];
+            }
         }
     }
 
@@ -156,7 +172,9 @@ private:
     T *_arr;
     int _capacity;
     int _currentSize;
-};template <class T, class cmpclass = Less<T>>
+};
+
+template <class T, class cmpclass = Less<T>>
 class Heap {
 public:
     Heap() :_size(0) {
@@ -181,19 +199,12 @@ public:
     }
 
     inline T top() {
-        if (empty()) { throw("heap is empty!"); }
+        if (empty()) { throw runtime_error("heap is empty!"); }
         return _arr[1];
     }
 
     inline size_t size() {
         return _size;
-    }
-
-    void print() {
-        for (size_t i = 1; i <= _size; ++i) {
-            cout << _arr[i] << " ";
-        }
-        cout << endl;
     }
 
     inline bool empty() {
@@ -288,21 +299,32 @@ public:
 };
 
 int main() {
-    int  N,M, S;
+    int  N, M, S;
     cin >> N >> M >> S;
+    S--;
     Vector<Vector<int>>edges;
     while (M--) {
         int u, v, w;
         cin >> u >> v >> w;
-        edges.push_back(Vector<int>{u, v, w});
+        Vector<int> edge{ u, v, w };
+        edges.push_back(edge);
     }
+    // for (int i = 0; i < edges.size(); ++i) {
+    //     auto edge = edges[i];
+    //     // cout << edge << endl;
+    // }
     Vector<Vector<E>> graph(N);
     for (int i = 0; i < edges.size(); ++i) {
         auto &edge = edges[i];
-        int u = edge[0], v = edge[1], w = edge[2];
+        int u = edge[0] - 1, v = edge[1] - 1, w = edge[2];
         graph[u].push_back({ v,w });
     }
-    cout << Solution().Dijsktra(M, graph, S) << endl;
-    //system("pause");
+    try {
+        cout << Solution().Dijsktra(N, graph, S) << endl;
+    }
+    catch (runtime_error &error) {
+        cerr << "Exception caught: " << error.what() << endl;
+    }
+    system("pause");
     return 0;
 }
