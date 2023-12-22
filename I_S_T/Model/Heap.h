@@ -14,31 +14,28 @@ public:
     }
     ~Heap() {
         _size = 0;
-        // delete _arr;
+        _arr.clear();
     }
 
     void push(T val) {
-        //write ur code here.
         _size++;
         _arr.push_back(val);
         flowup();
     }
 
     void pop() {
-        //write ur code here.
         if (_size == 0) return;
         _arr[1] = _arr[_size--];
+        _arr.pop_back();
         sinkdown();
     }
 
-    T top() {
-        //write ur code here.
+    inline T top() {
         if (empty()) { throw("heap is empty!"); }
         return _arr[1];
     }
 
-    size_t size() {
-        //write ur code here.
+    inline size_t size() {
         return _size;
     }
 
@@ -49,7 +46,7 @@ public:
         cout << endl;
     }
 
-    bool empty() {
+    inline bool empty() {
         return _size == 0;
     }
 
@@ -65,16 +62,16 @@ protected:
  *
  *
 */
-    size_t father(size_t idx) {
+    inline size_t father(size_t idx) {
         return idx >> 1;
     }
 
-    size_t son_l(size_t idx) {
+    inline size_t son_l(size_t idx) {
         size_t l = idx << 1;
         return l <= _size ? l : 0;
     }
 
-    size_t son_r(size_t idx) {
+    inline size_t son_r(size_t idx) {
         size_t r = 1 + (idx << 1);
         return r <= _size ? r : 0;
     }
@@ -82,19 +79,23 @@ protected:
     void flowup() {
         // push 之后
         for (size_t pos = _size, _father = father(pos);
-            _father != 0 && cmp(_arr[_father],_arr[pos]);
+            _father != 0 && cmp(_arr[_father], _arr[pos]);
             pos = _father, _father = father(pos))
             swap(_arr[pos], _arr[_father]);
     }
 
     void sinkdown() {
         // pop 之后
-        if(_size <= 0) return;
+        if (empty()) return;
         for (size_t pos = 1; ; ) {
             size_t sonl = son_l(pos), sonr = son_r(pos);
             if (sonl == 0 && sonr == 0) return;
-            size_t toswap = (cmp(_arr[sonr],_arr[sonl]) ? sonl : sonr);
-            if (!cmp(_arr[pos],_arr[toswap]))
+            size_t toswap = sonl;
+            if (sonl == 0) toswap = sonr;
+            else if (sonr != 0) {
+                toswap = (cmp(_arr[sonr], _arr[sonl]) ? sonl : sonr);
+            }
+            if (!cmp(_arr[pos], _arr[toswap]))
                 return;
             swap(_arr[pos], _arr[toswap]);
             pos = toswap;

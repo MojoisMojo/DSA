@@ -10,7 +10,7 @@
 #ifndef PRORITYQUEUE
 #define PRORITYQUEUE
 template <class T, class cmp = Less<T>>
-class ProrityQueue:public Heap<T,cmp> {
+class ProrityQueue :public Heap<T, cmp> {
 
 };
 

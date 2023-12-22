@@ -2,9 +2,9 @@
 #define VECTOR_H
 #include <iostream>
 using namespace std;
-#define minSize 10
 template <class T>
 class Vector {
+    const static int minSize = 10;// 初始容量为10
     void changeCapacity(int new_capacity) {
         if (new_capacity < this->_currentSize) {
             throw("Capacity can not be smaller than size!");
@@ -30,7 +30,7 @@ class Vector {
     }
 public:
     Vector() {
-        _capacity = 10; // 初始容量为10
+        _capacity = this->minSize;
         _arr = new T[_capacity];
         _currentSize = 0;
     }
@@ -52,7 +52,7 @@ public:
         return *this;
     }
 
-    // 向数组末尾添加元素，如果数组已满，扩展容量，扩展为原来的两倍
+    // 向数组末尾添加元素，如果数组已满，扩展容量，扩展为原来的1.5倍
     void push_back(T value) {
         if (_currentSize >= _capacity) {
             this->changeCapacity((this->_capacity * 3) / 2);
@@ -64,15 +64,17 @@ public:
         this->erase(_currentSize - 1);
     }
 
-    // 删除指定索引的元素，如果剩余元素不足capacity的一半，将capacity缩小一半，最小容量为10
+    // 删除指定索引的元素
     void erase(int index) {
         if (index >= _currentSize) {
             throw("index overflows!");
         }
-        memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
-        // if (_capacity >= (minSize << 1) && _currentSize < ((1 + _capacity) >> 1)) {
-        //     this->changeCapacity(this->_capacity >> 1);
-        // }
+        else if (index == _currentSize - 1) {
+            _currentSize--;
+        }
+        else {
+            memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
+        }
     }
 
     int &operator[](int index) {

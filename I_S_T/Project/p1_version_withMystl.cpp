@@ -21,7 +21,7 @@ public:
 
 template <class T>
 class Vector {
-    const int minSize = 10;
+    const static int minSize = 10;// 初始容量为10
     void changeCapacity(int new_capacity) {
         if (new_capacity < this->_currentSize) {
             throw("Capacity can not be smaller than size!");
@@ -47,12 +47,13 @@ class Vector {
     }
 public:
     Vector() {
-        _capacity = 10; // 初始容量为10
+        _capacity = this->minSize;
         _arr = new T[_capacity];
         _currentSize = 0;
     }
     ~Vector() {
         delete[] _arr;
+        _arr = nullptr;
     }
     Vector(const Vector &other) {
         *this = other;
@@ -68,10 +69,10 @@ public:
         return *this;
     }
 
-    // 向数组末尾添加元素，如果数组已满，扩展容量，扩展为原来的两倍
+    // 向数组末尾添加元素，如果数组已满，扩展容量，扩展为原来的1.5倍
     void push_back(T value) {
         if (_currentSize >= _capacity) {
-            this->changeCapacity(this->_capacity << 1);
+            this->changeCapacity((this->_capacity * 3) / 2);
         }
         _arr[_currentSize++] = value;
     }
@@ -80,17 +81,16 @@ public:
         this->erase(_currentSize - 1);
     }
 
-    // 删除指定索引的元素，如果剩余元素不足capacity的一半，将capacity缩小一半，最小容量为10
+    // 删除指定索引的元素
     void erase(int index) {
         if (index >= _currentSize) {
             throw("index overflows!");
         }
-        _currentSize--;
-        for (int i = index; i < _currentSize; i++) {
-            _arr[i] = _arr[i + 1];
+        else if (index == _currentSize - 1) {
+            _currentSize--;
         }
-        if (_capacity >= (minSize << 1) && _currentSize < ((1 + _capacity) >> 1)) {
-            this->changeCapacity(this->_capacity >> 1);
+        else {
+            memmove(_arr + index, _arr + index + 1, ((--_currentSize) - index) * sizeof(T));
         }
     }
 
@@ -138,32 +138,28 @@ public:
     }
     ~Heap() {
         _size = 0;
-        // delete _arr;
+        _arr.clear();
     }
 
     void push(T val) {
-        //write ur code here.
         _size++;
         _arr.push_back(val);
         flowup();
     }
 
     void pop() {
-        //write ur code here.
         if (_size == 0) return;
         _arr[1] = _arr[_size--];
         _arr.pop_back();
         sinkdown();
     }
 
-    T top() {
-        //write ur code here.
+    inline T top() {
         if (empty()) { throw("heap is empty!"); }
         return _arr[1];
     }
 
-    size_t size() {
-        //write ur code here.
+    inline size_t size() {
         return _size;
     }
 
@@ -174,7 +170,7 @@ public:
         cout << endl;
     }
 
-    bool empty() {
+    inline bool empty() {
         return _size == 0;
     }
 
@@ -190,16 +186,16 @@ protected:
  *
  *
 */
-    size_t father(size_t idx) {
+    inline size_t father(size_t idx) {
         return idx >> 1;
     }
 
-    size_t son_l(size_t idx) {
+    inline size_t son_l(size_t idx) {
         size_t l = idx << 1;
         return l <= _size ? l : 0;
     }
 
-    size_t son_r(size_t idx) {
+    inline size_t son_r(size_t idx) {
         size_t r = 1 + (idx << 1);
         return r <= _size ? r : 0;
     }
@@ -214,11 +210,15 @@ protected:
 
     void sinkdown() {
         // pop 之后
-        if (_size == 0) return;
+        if (empty()) return;
         for (size_t pos = 1; ; ) {
             size_t sonl = son_l(pos), sonr = son_r(pos);
             if (sonl == 0 && sonr == 0) return;
-            size_t toswap = (cmp(_arr[sonr], _arr[sonl]) ? sonl : sonr);
+            size_t toswap = sonl;
+            if (sonl == 0) toswap = sonr;
+            else if (sonr != 0) {
+                toswap = (cmp(_arr[sonr], _arr[sonl]) ? sonl : sonr);
+            }
             if (!cmp(_arr[pos], _arr[toswap]))
                 return;
             swap(_arr[pos], _arr[toswap]);
@@ -228,7 +228,7 @@ protected:
 };
 
 template <class T, class cmp = Less<T>>
-class ProrityQueue:public Heap<T,cmp> {
+class ProrityQueue :public Heap<T, cmp> {
 
 };
 
