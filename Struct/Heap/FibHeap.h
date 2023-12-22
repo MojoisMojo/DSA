@@ -18,14 +18,8 @@ private:
         FibNode *parent;        // 父节点
         bool marked;     // 是否被删除第一个孩子
 
-        FibNode(int key) {
-            this->key = key;
-            this->degree = 0;
-            this->marked = false;
-            this->left = this;
-            this->right = this;
-            this->parent = nullptr;
-            this->child = nullptr;
+        FibNode(int key)
+            :key(key), degree(0), marked(false), left(this), right(this), parent(nullptr), child(nullptr) {
         }
     }*min;        // 最小节点(某个最小堆的根节点)
 
@@ -33,6 +27,9 @@ public:
     FibHeap() {
         this->keyNum = 0;
         this->min = nullptr;
+    }
+    ~FibHeap() {
+        this->destroy();
     }
 private:
     /*
@@ -74,9 +71,7 @@ public:
      * 新建键值为key的节点，并将其插入到斐波那契堆中
      */
     void insert(int key) {
-        FibNode *node;
-
-        node = new FibNode(key);
+        FibNode *node = new FibNode(key);
         if (node == nullptr)
             return;
 
@@ -97,19 +92,19 @@ private:
     }
 public:
     /*
-     * 将other合并到当前堆中
+     * 将other合并到当前堆中 不删除other
      */
-    void unionHeap(FibHeap *&other) {
+    void unionHeap(FibHeap *other) {
         if (other == nullptr)
             return;
 
         if ((this->min) == nullptr) {                // this无"最小节点"
             this->min = other->min;
             this->keyNum = other->keyNum;
-            other = nullptr;
+            // other = nullptr;
         }
         else if ((other->min) == nullptr) {        // this有"最小节点" && other无"最小节点"
-            other = nullptr;
+            // other = nullptr;
         }
         else {                                // this有"最小节点" && other有"最小节点"
             // 将"other中根链表"添加到"this"中
@@ -118,7 +113,7 @@ public:
             if (this->min->key > other->min->key)
                 this->min = other->min;
             this->keyNum += other->keyNum;
-            other = nullptr;
+            // other = nullptr;
         }
     }
 private:
@@ -139,7 +134,6 @@ private:
 
         return p;
     }
-private:
     /*
      * 将node链接到root根结点
      */
@@ -156,7 +150,6 @@ private:
         root->degree++;
         node->marked = false;
     }
-private:
     /*
      * 合并斐波那契堆的根链表中左右相同度数的树
      */
@@ -204,6 +197,8 @@ private:
                 }
             }
         }
+
+        delete[]cons;
     }
 public:
     /*
@@ -247,8 +242,9 @@ public:
      * 获取斐波那契堆中最小键值；失败返回-1
      */
     int minimum() {
-        if (min == nullptr)
-            return -1;
+        if (min == nullptr) {
+            cerr << "no element in FibHeap!\n"; return -1;
+        }
 
         return min->key;
     }
@@ -261,7 +257,6 @@ private:
         if (parent->parent != nullptr)
             renewDegree(parent->parent, degree);
     }
-private:
     /*
      * 将node从父节点parent的子链接中剥离出来，
      * 并使node成为"堆的根链表"中的一员。
@@ -281,7 +276,6 @@ private:
         // 将"node所在树"添加到"根链表"中
         addNode(node, min);
     }
-private:
     /*
      * 对节点node进行"级联剪切"
      *
@@ -302,7 +296,6 @@ private:
             }
         }
     }
-private:
     /*
      * 将斐波那契堆中节点node的值减少为key
      */
@@ -327,7 +320,6 @@ private:
         if (node->key < min->key)
             min = node;
     }
-private:
     /*
      * 将斐波那契堆中节点node的值增加为key
      */
@@ -374,7 +366,6 @@ private:
             }
         }
     }
-private:
     /*
      * 更新斐波那契堆的节点node的键值为key
      */
@@ -384,7 +375,7 @@ private:
         else if (key > node->key)
             increase(node, key);
         else
-            cerr << ("No need to update!!!\n");
+            clog << "No need to update!!!\n";
     }
 public:
     void update(int oldkey, int newkey) {
@@ -419,7 +410,6 @@ private:
 
         return p;
     }
-private:
     /*
      * 在斐波那契堆中查找键值为key的节点
      */
@@ -438,96 +428,113 @@ public:
         return search(key) != nullptr ? true : false;
     }
 private:
-    /*
-     * 删除结点node
-     */
-    void remove(FibNode *node) {
-        int m = min->key;
-        decrease(node, m - 1);
-        removeMin();
-    }
+    void remove(FibNode *node);
 public:
-    void remove(int key) {
-        if (min == nullptr)
-            return;
-
-        FibNode *node = search(key);
-        if (node == nullptr)
-            return;
-
-        remove(node);
-    }
+    void remove(int key);
 private:
-    /*
-     * 销毁斐波那契堆
-     */
-    void destroyNode(FibNode *node) {
-        if (node == nullptr)
-            return;
-
-        FibNode *start = node;
-        do {
-            destroyNode(node->child);
-            // 销毁node，并将node指向下一个
-            node = node->right;
-            node->left = nullptr;
-        } while (node != start);
-    }
+    void destroyHelper(FibNode *node);
 public:
-    void destroy() {
-        destroyNode(min);
-    }
+    void destroy();
 private:
-    /*
-     * 打印"斐波那契堆"
-     *
-     * 参数说明：
-     *     node       -- 当前节点
-     *     prev       -- 当前节点的前一个节点(父节点or兄弟节点)
-     *     direction  --  1，表示当前节点是一个左孩子;
-     *                    2，表示当前节点是一个兄弟节点。
-     */
-    void print(FibNode *node, FibNode *prev, int direction) {
-        FibNode *start = node;
-
-        if (node == nullptr)
-            return;
-        do {
-            if (direction == 1)
-                cerr << node->key << "(" << node->degree << ") is " << prev->key << "'s child\n";
-            else
-                cerr << node->key << "(" << node->degree << ") is " << prev->key << "'s next\n";
-
-            if (node->child != nullptr)
-                print(node->child, node, 1);
-
-            // 兄弟节点
-            prev = node;
-            node = node->right;
-            direction = 2;
-        } while (node != start);
-    }
+    void printHelper(FibNode *node, FibNode *prev, int direction);
 public:
-    void print() {
-        if (min == nullptr)
-            return;
-
-        int i = 0;
-        FibNode *p = min;
-        cerr << ("== 斐波那契堆的详细信息: ==\n");
-        do {
-            i++;
-            cerr << i << "-> " << p->key << "(" << p->degree << ") is root\n";
-
-            print(p->child, p, 1);
-            p = p->right;
-        } while (p != min);
-        cerr << endl;
-    }
+    void print();
 };
 
-int main() {
 
-    //system("pause");
-    return 0;
+/*
+ * 删除结点node
+ */
+void FibHeap::remove(FibNode *node) {
+    int m = min->key;
+    decrease(node, m - 1);
+    removeMin();
+}
+/*
+ * 删除一个值
+ */
+void FibHeap::remove(int key) {
+    if (min == nullptr)
+        return;
+
+    FibNode *node = search(key);
+    if (node == nullptr)
+        return;
+
+    remove(node);
+}
+
+/*
+ * 销毁斐波那契堆
+ */
+void FibHeap::destroy() {
+    destroyHelper(min);
+    min = nullptr;
+}
+
+/*
+ * 销毁斐波那契堆
+ */
+void FibHeap::destroyHelper(FibNode *node) {
+    if (node == nullptr)
+        return;
+
+    FibNode *start = node;
+    do {
+        destroyHelper(node->child);
+        FibNode *todelete = node;
+        // 销毁node，并将node指向下一个
+        node = node->right;
+        node->left = nullptr;
+        delete todelete;
+    } while (node != start);
+}
+
+/*
+ * 打印"斐波那契堆"
+ *
+ * 参数说明：
+ *     node       -- 当前节点
+ *     prev       -- 当前节点的前一个节点(父节点or兄弟节点)
+ *     direction  --  1，表示当前节点是一个左孩子;
+ *                    2，表示当前节点是一个兄弟节点。
+ */
+void FibHeap::printHelper(FibNode *node, FibNode *prev, int direction) {
+    FibNode *start = node;
+
+    if (node == nullptr)
+        return;
+    do {
+        if (direction == 1)
+            clog << node->key << "(" << node->degree << ") is " << prev->key << "'s child\n";
+        else
+            clog << node->key << "(" << node->degree << ") is " << prev->key << "'s next\n";
+
+        if (node->child != nullptr)
+            printHelper(node->child, node, 1);
+
+        // 兄弟节点
+        prev = node;
+        node = node->right;
+        direction = 2;
+    } while (node != start);
+}
+
+void FibHeap::print() {
+    if (min == nullptr) {
+        cerr << "no element in Heap!!\n";
+        return;
+    }
+
+    int i = 0;
+    FibNode *p = min;
+    clog << "== 斐波那契堆的详细信息: ==\n";
+    do {
+        i++;
+        clog << i << "-> " << p->key << "(" << p->degree << ") is root\n";
+
+        printHelper(p->child, p, 1);
+        p = p->right;
+    } while (p != min);
+    clog << endl;
 }
