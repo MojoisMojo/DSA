@@ -5,43 +5,48 @@ using namespace std;
 class Solution {
 public:
     int minimumMountainRemovals(vector<int> &nums) {
-        // 1 4 5 2 6 7 6
-        // 4 1 2 3
-        // idx
-        // find < num 最大
-        // stack:[i,j], precost[j] = precost[i] + (j-i-1)
         int n = nums.size();
         vector<int> idx_stack;
         vector<int> precost(n, 0), suffcost(n, 0);
         for (int i = 0; i < n; ++i) {
-            idx_stack.insert(lower_bound(idx_stack.begin(), idx_stack.end(), i, [&](int x, int y)->bool {return nums[x] < nums[y];}), i);
-            int j = idx_stack.top();
-            suffcost[i] = suffcost[j] + j - i - 1;
-            idx_stack.push(i);`
+            int num = nums[i];
+            auto it = lower_bound(idx_stack.begin(), idx_stack.end(), num);
+            if (it == idx_stack.end()) {
+                idx_stack.push_back(num);
+            }
+            else {
+                idx_stack[it - idx_stack.begin()] = num;
+            }
+            precost[i] = (i + 1) - idx_stack.size();
+            if (it - idx_stack.begin() == 0) {
+                precost[i] = 0x3f3f3f3f;
+            }
         }
         for (auto pre : precost) {
             cout << pre << " ";
         }
         cout << endl;
+        vector<int>().swap(idx_stack);
         for (int i = n - 1; i >= 0; --i) {
-            while (!idx_stack.empty() && nums[idx_stack.top()] >= nums[i]) {
-                idx_stack.pop();
-            }
-            if (idx_stack.empty()) {
-                suffcost[i] = n - i - 1;
+            int num = nums[i];
+            auto it = lower_bound(idx_stack.begin(), idx_stack.end(), num);
+            if (it == idx_stack.end()) {
+                idx_stack.push_back(num);
             }
             else {
-                int j = idx_stack.top();
-                suffcost[i] = suffcost[j] + j - i - 1;
+                idx_stack[it - idx_stack.begin()] = num;
             }
-            idx_stack.push(i);
+            suffcost[i] = (n - i) - idx_stack.size();
+            if (it - idx_stack.begin() == 0) {
+                suffcost[i] = 0x3f3f3f3f;
+            }
         }
         for (auto suff : suffcost) {
             cout << suff << " ";
         }
         cout << endl;
         int ans = 0x3f3f3f3f;
-        for (int i = 0; i < n; ++i) {
+        for (int i = 1; i < n - 1; ++i) {
             ans = min(ans, precost[i] + suffcost[i]);
         }
         return ans;
@@ -49,8 +54,8 @@ public:
 };
 
 int main() {
-
-
+    vector<int> v{ 1,3,1 };
+    cout << Solution().minimumMountainRemovals(v);
     //system("pause");
     return 0;
 }
